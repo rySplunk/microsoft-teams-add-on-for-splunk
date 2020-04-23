@@ -1,0 +1,64 @@
+{
+    "requests": [
+        {
+            "pre_process": {
+                "pipeline": [], 
+                "skip_conditions": []
+            }, 
+            "post_process": {
+                "pipeline": [
+                    {
+                        "output": "__stdout__", 
+                        "method": "splunk_xml", 
+                        "input": [
+                            "{{__response__.body}}", 
+                            "", 
+                            "{{index}}", 
+                            "{{host}}", 
+                            "{{source}}", 
+                            "{{sourcetype}}"
+                        ]
+                    }, 
+                    {
+                        "method": "std_output", 
+                        "input": [
+                            "{{__stdout__}}"
+                        ]
+                    }
+                ], 
+                "skip_conditions": [
+                    {
+                        "method": "json_empty", 
+                        "input": [
+                            "{{__response__.body}}", 
+                            "$"
+                        ]
+                    }
+                ]
+            }, 
+            "request": {
+                "url": "https://graph.microsoft.com/beta/reports/getOffice365ServicesUserCounts(period='D7')?$format=application/json", 
+                "method": "GET", 
+                "headers": {
+                    "Authorization": "Bearer {{__settings__.additional_parameters.bearer_token}}"
+                }
+            }, 
+            "iteration_mode": {
+                "stop_conditions": [], 
+                "iteration_count": "1"
+            }
+        }
+    ], 
+    "tokens": [
+        "__settings__.logging.loglevel", 
+        "__settings__.additional_parameters.bearer_token"
+    ], 
+    "global_settings": {
+        "logging": {
+            "level": "{{__settings__.logging.loglevel}}"
+        }
+    }, 
+    "meta": {
+        "apiVersion": "1.0.0"
+    }
+}
